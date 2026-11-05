@@ -1,0 +1,272 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Career Intelligence Assistant</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Literata:opsz,wght@7..72,600;7..72,700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: single column; two-part Agent → Sheet diagram; JSON-section-to-Sheet-tab mapping table */
+:root {
+  --bg: #f2f4f6; --paper: #ffffff; --ink: #17222c; --muted: #5a6875; --line: #d6dde3;
+  --accent: #0f5c6e; --accent-soft: #e1eef1;
+  --sheet: #1d6b45; --sheet-soft: #e0f0e7;
+  --tag-jd: #9a5b00; --tag-jd-bg: #fbefd9; --tag-kb: #0f6b5a; --tag-kb-bg: #dcf1ea;
+  --code-bg: #f6f8f9;
+  --f-display: "Literata", Georgia, "Times New Roman", serif;
+  --f-body: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11171c; --paper: #182128; --ink: #e4eaee; --muted: #9aa8b3; --line: #2a3640;
+    --accent: #6cc3d5; --accent-soft: #19323a;
+    --sheet: #72cf9c; --sheet-soft: #163026;
+    --tag-jd: #f0b860; --tag-jd-bg: #3a2c14; --tag-kb: #6fd4b8; --tag-kb-bg: #14342c;
+    --code-bg: #141c22;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11171c; --paper: #182128; --ink: #e4eaee; --muted: #9aa8b3; --line: #2a3640;
+  --accent: #6cc3d5; --accent-soft: #19323a;
+  --sheet: #72cf9c; --sheet-soft: #163026;
+  --tag-jd: #f0b860; --tag-jd-bg: #3a2c14; --tag-kb: #6fd4b8; --tag-kb-bg: #14342c;
+  --code-bg: #141c22;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--f-body); font-size: 16px; line-height: 1.65;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+main { max-width: 900px; margin: 0 auto; padding-block: 52px 64px; display: grid; gap: 64px; }
+h1, h2, h3 { margin: 0; line-height: 1.2; text-wrap: balance; }
+h1 { font-family: var(--f-display); font-size: clamp(2rem, 5.5vw, 3rem); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-family: var(--f-display); font-size: 1.5rem; font-weight: 600; }
+h3 { font-size: 1rem; font-weight: 600; }
+p { margin: 0; max-width: 65ch; }
+.eyebrow { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.muted { color: var(--muted); }
+.mono { font-family: var(--f-mono); font-size: 0.85em; }
+.tag { display: inline-block; font-family: var(--f-mono); font-size: 0.72rem; padding: 1px 7px; border-radius: 4px; white-space: nowrap; }
+.tag.jd { color: var(--tag-jd); background: var(--tag-jd-bg); }
+.tag.kb { color: var(--tag-kb); background: var(--tag-kb-bg); }
+.block { display: grid; gap: 22px; }
+.block > header { display: grid; gap: 8px; }
+
+/* Hero */
+.hero { display: grid; gap: 18px; }
+.lede { font-size: 1.15rem; }
+.lede strong { color: var(--accent); font-weight: 600; }
+
+/* Two components */
+.duo { display: grid; grid-template-columns: minmax(0, 1fr) 56px minmax(0, 1fr); align-items: stretch; }
+.comp { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 22px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.comp.agent { border-top: 3px solid var(--accent); }
+.comp.sheet { border-top: 3px solid var(--sheet); }
+.comp .role { font-family: var(--f-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; }
+.comp.agent .role { color: var(--accent); }
+.comp.sheet .role { color: var(--sheet); }
+.comp h3 { font-family: var(--f-display); font-size: 1.25rem; }
+.comp dl { margin: 0; display: grid; gap: 10px; font-size: 0.92rem; }
+.comp dt { font-family: var(--f-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+.comp dd { margin: 0; }
+.link { display: grid; place-items: center; align-content: center; gap: 4px; color: var(--muted); font-family: var(--f-mono); font-size: 0.7rem; text-align: center; }
+.link .arrow { font-size: 1.3rem; color: var(--ink); }
+@media (max-width: 720px) {
+  .duo { grid-template-columns: minmax(0, 1fr); }
+  .link { padding: 10px 0; grid-auto-flow: column; gap: 10px; }
+  .link .arrow { transform: rotate(90deg); }
+}
+
+/* User flow */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.steps li { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 6px; align-content: start; }
+.steps li.once { background: transparent; border-style: dashed; }
+.steps .n { font-family: var(--f-mono); font-size: 0.78rem; color: var(--accent); }
+.steps p { font-size: 0.88rem; color: var(--muted); }
+.steps .where { font-family: var(--f-mono); font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+@media (max-width: 760px) { .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 440px) { .steps { grid-template-columns: minmax(0, 1fr); } }
+
+/* Agent pipeline */
+.pipe { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.6fr) minmax(0, 0.8fr); gap: 14px; align-items: stretch; }
+.col { display: grid; gap: 10px; align-content: start; min-width: 0; }
+.col > .head { font-family: var(--f-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+.src { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: grid; gap: 4px; font-size: 0.88rem; }
+.src .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.src p { color: var(--muted); font-size: 0.84rem; }
+.stages { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-left: 2px solid var(--accent); }
+.stages li { padding: 8px 0 10px 16px; position: relative; display: grid; gap: 2px; }
+.stages li::before { content: ""; position: absolute; left: -6px; top: 15px; width: 10px; height: 10px; border-radius: 50%; background: var(--bg); border: 2px solid var(--accent); }
+.stages b { font-weight: 600; font-size: 0.94rem; }
+.stages span { color: var(--muted); font-size: 0.86rem; }
+.out { background: var(--accent-soft); border-radius: 8px; padding: 14px; display: grid; gap: 6px; font-size: 0.88rem; }
+.out b { font-family: var(--f-mono); font-weight: 500; }
+@media (max-width: 760px) { .pipe { grid-template-columns: minmax(0, 1fr); } }
+
+/* Decomposition */
+.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 20px; align-items: start; }
+pre.json { margin: 0; background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 16px; font-family: var(--f-mono); font-size: 0.8rem; line-height: 1.7; overflow-x: auto; color: var(--muted); }
+pre.json .k { color: var(--accent); font-weight: 500; }
+pre.json .c { color: var(--muted); opacity: 0.75; }
+.map { display: grid; gap: 0; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); overflow: hidden; }
+.map .r { display: grid; grid-template-columns: minmax(0, 1fr) 20px minmax(0, 1.3fr); gap: 8px; padding: 12px 14px; align-items: start; border-top: 1px solid var(--line); font-size: 0.88rem; }
+.map .r:first-child { border-top: none; }
+.map .r.h { font-family: var(--f-mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); padding-block: 9px; background: var(--code-bg); }
+.map code { font-family: var(--f-mono); font-size: 0.8rem; color: var(--accent); word-break: break-word; }
+.map .ar { color: var(--muted); text-align: center; }
+.map .tab b { color: var(--sheet); font-weight: 600; display: block; }
+.map .tab span { color: var(--muted); font-size: 0.82rem; }
+@media (max-width: 760px) { .split { grid-template-columns: minmax(0, 1fr); } }
+
+.gate { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.gate > div { border-top: 2px solid var(--sheet); padding-top: 10px; display: grid; gap: 4px; font-size: 0.9rem; }
+.gate p { color: var(--muted); font-size: 0.86rem; }
+@media (max-width: 640px) { .gate { grid-template-columns: minmax(0, 1fr); } }
+
+.note { background: var(--accent-soft); border-radius: 10px; padding: 16px 18px; font-size: 0.93rem; }
+footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); padding-top: 18px; display: grid; gap: 2px; }
+footer .proj { color: var(--ink); font-weight: 500; }
+footer a { color: var(--accent); font-weight: 600; text-underline-offset: 3px; }
+footer a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+</style>
+
+<main lang="en">
+
+  <header class="hero">
+    <span class="eyebrow">System overview</span>
+    <h1>Career Intelligence Assistant</h1>
+    <p class="lede">Upload a job description and get a clear answer: <strong>is this opportunity worth pursuing for you, and what is the evidence?</strong></p>
+    <p class="muted">The system has two parts. An AI agent reads the JD, compares it with your profile and returns the result as JSON. A Google Sheet acts as the repository: it takes the JSON, validates it again, and splits it into tables so you can track and compare opportunities over time.</p>
+  </header>
+
+  <!-- Two components -->
+  <section class="block" aria-labelledby="h-parts">
+    <header><h2 id="h-parts">Two components</h2></header>
+    <div class="duo">
+      <article class="comp agent">
+        <span class="role">Processor</span>
+        <h3>AI agent</h3>
+        <dl>
+          <div><dt>Takes in</dt><dd>A JD as a PDF each time, plus your preloaded profile (CV, competency evaluation, career path).</dd></div>
+          <div><dt>Does</dt><dd>Analyzes the role, matches each requirement against your profile, assesses fit and makes an evidence-backed recommendation.</dd></div>
+          <div><dt>Returns</dt><dd>Exactly one JSON block in a fixed structure, already self-checked.</dd></div>
+        </dl>
+      </article>
+      <div class="link" aria-hidden="true"><span class="arrow">→</span><span>JSON</span></div>
+      <article class="comp sheet">
+        <span class="role">Repository</span>
+        <h3>Google Sheet</h3>
+        <dl>
+          <div><dt>Takes in</dt><dd>The JSON block you paste through the menu <span class="mono">Career Intelligence → Import Job Analysis</span>.</dd></div>
+          <div><dt>Does</dt><dd>Apps Script re-validates everything, assigns a JOB ID and splits the result into 5 tables.</dd></div>
+          <div><dt>Keeps</dt><dd>The full history of analyzed jobs, ready to filter and compare.</dd></div>
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <!-- User flow -->
+  <section class="block" aria-labelledby="h-flow">
+    <header>
+      <h2 id="h-flow">What you do</h2>
+      <p class="muted">Load your profile once. After that, each JD takes three actions.</p>
+    </header>
+    <ol class="steps">
+      <li class="once"><span class="n">Once</span><h3>Load your profile</h3><p>Give the agent your CV, competency evaluation and career path. Redo this only when your profile changes.</p><span class="where">Agent</span></li>
+      <li><span class="n">1</span><h3>Upload the JD</h3><p>One PDF of the job posting. The agent analyzes it and returns a JSON block.</p><span class="where">Agent</span></li>
+      <li><span class="n">2</span><h3>Paste the JSON into the Sheet</h3><p>Copy the JSON block, open the Sheet, choose Import Job Analysis, paste and click Import.</p><span class="where">Google Sheet</span></li>
+      <li><span class="n">3</span><h3>Review and decide</h3><p>Read the result in Job Pipeline, compare it with earlier jobs and update the application status.</p><span class="where">Google Sheet</span></li>
+    </ol>
+  </section>
+
+  <!-- Agent processing -->
+  <section class="block" aria-labelledby="h-agent">
+    <header>
+      <h2 id="h-agent">From CV and JD to a result</h2>
+      <p class="muted">Inside the agent, the two input sources pass through five stages before becoming one JSON block.</p>
+    </header>
+    <div class="pipe">
+      <div class="col">
+        <span class="head">Inputs</span>
+        <div class="src"><div class="row"><span class="tag jd">[JD]</span><h3>Job Description</h3></div><p>A PDF uploaded in the current turn. Pasted text, links and images are not accepted.</p></div>
+        <div class="src"><div class="row"><span class="tag kb">[KB:CV]</span></div><p>Experience and achievements.</p></div>
+        <div class="src"><div class="row"><span class="tag kb">[KB:Evaluation]</span></div><p>Strengths and areas to develop.</p></div>
+        <div class="src"><div class="row"><span class="tag kb">[KB:CareerPath]</span></div><p>Preferred directions and directions to avoid.</p></div>
+      </div>
+      <div class="col">
+        <span class="head">Agent processing</span>
+        <ol class="stages">
+          <li><b>Check inputs</b><span>Is it a PDF, is it actually a JD, does the profile have all three parts? If not, stop and report back.</span></li>
+          <li><b>Understand the role</b><span>What problem the role solves, key responsibilities, success criteria, required and preferred skills.</span></li>
+          <li><b>Match each requirement</b><span>Each JD requirement goes into Strong Match, Transferable, Capability Gap or Missing Evidence, citing both the JD and your profile.</span></li>
+          <li><b>Assess and recommend</b><span>Rate career alignment, skill fit, risk and learning opportunity; apply the fixed rule table D1–D8 to reach a recommendation.</span></li>
+          <li><b>Self-validate</b><span>Check the structure and cross-field rules, fix any errors, then output.</span></li>
+        </ol>
+      </div>
+      <div class="col">
+        <span class="head">Output</span>
+        <div class="out"><b>1 JSON block</b><span>Five data sections, each mapping to one table in the Sheet.</span></div>
+        <p class="muted" style="font-size:0.86rem">Every finding in the JSON carries a source label such as <span class="tag jd">[JD]</span> or <span class="tag kb">[KB:CV]</span>. No evidence, no conclusion.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Decomposition -->
+  <section class="block" aria-labelledby="h-split">
+    <header>
+      <h2 id="h-split">How the JSON is split into the repository</h2>
+      <p class="muted">Apps Script reads each section of the JSON block and writes it to its matching table. All rows for the same job are linked by one JOB ID.</p>
+    </header>
+    <div class="split">
+<pre class="json" aria-label="Condensed structure of the JSON block">{
+  <span class="k">"job"</span>: {
+    company, title,
+    recommendation, decided_by
+  },
+  <span class="k">"jd_analysis"</span>: {
+    role_summary, responsibilities,
+    success_criteria, skills
+  },
+  <span class="k">"candidate_matching"</span>: [
+    { requirement, priority,
+      category, evidence }
+    <span class="c">// one item per requirement</span>
+  ],
+  <span class="k">"career_assessment"</span>: {
+    alignment, skill_fit, risk,
+    growth, learning, rationale
+  },
+  <span class="k">"company"</span>: {
+    name, industry, notes
+  }
+}</pre>
+      <div class="map" role="table" aria-label="Mapping of JSON sections to Sheet tables">
+        <div class="r h" role="row"><span role="columnheader">JSON section</span><span></span><span role="columnheader">Sheet table</span></div>
+        <div class="r" role="row"><code role="cell">job</code><span class="ar">→</span><div class="tab" role="cell"><b>01 Job Pipeline</b><span>1 row per job: company, role, recommendation, ratings, application status.</span></div></div>
+        <div class="r" role="row"><code role="cell">jd_analysis</code><span class="ar">→</span><div class="tab" role="cell"><b>02 JD Analysis</b><span>1 row per job: role summary, responsibilities, success criteria, skills.</span></div></div>
+        <div class="r" role="row"><code role="cell">candidate_matching[]</code><span class="ar">→</span><div class="tab" role="cell"><b>03 Candidate Matching</b><span>1 row per requirement: match category, priority, evidence. One job can produce dozens of rows.</span></div></div>
+        <div class="r" role="row"><code role="cell">career_assessment</code><span class="ar">→</span><div class="tab" role="cell"><b>04 Career Assessment</b><span>1 row per job: rating for each dimension; reasons and evidence live in cell notes.</span></div></div>
+        <div class="r" role="row"><code role="cell">company</code><span class="ar">→</span><div class="tab" role="cell"><b>05 Company Repository</b><span>1 row per company: enriched over successive JDs without overwriting earlier information.</span></div></div>
+      </div>
+    </div>
+
+    <div class="gate">
+      <div><h3>Re-validate</h3><p>Apps Script reruns every rule. A single failure rejects the import and no rows are written.</p></div>
+      <div><h3>Assign a JOB ID</h3><p>Generates one unique ID and attaches it to every row of the job across all five tables.</p></div>
+      <div><h3>Write all or nothing</h3><p>If anything fails midway, the whole write is rolled back. No half-written jobs.</p></div>
+    </div>
+    <p class="muted" style="font-size:0.9rem">The agent checks before returning JSON, and Apps Script checks again before saving. With two independent gates, the repository only holds valid data.</p>
+  </section>
+
+  <footer>
+    <p class="proj">Career Intelligence Assistant — Product &amp; System Design</p>
+    <p>Designed &amp; documented by <a href="https://www.linkedin.com/in/tran-thi-thuy-trang" target="_blank" rel="noopener">Amber</a>.</p>
+  </footer>
+
+</main>
+
+</body></html>
